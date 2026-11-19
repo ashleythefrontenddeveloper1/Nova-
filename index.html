@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#11111d">
+  <meta name="description" content="NOVA Commerce Intelligence — manage sales, orders, customers and inventory.">
+  <title>NOVA — Commerce Intelligence</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Supporting libraries: charts and icons -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+
+<body>
+  <div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" data-view-link="overview">
+        <span class="brand-symbol">N</span>
+        <span>NOVA<span class="brand-period">.</span></span>
+      </a>
+
+      <div class="workspace-switcher">
+        <div class="workspace-logo">N</div>
+        <div class="workspace-copy">
+          <strong>NOVA Store</strong>
+          <span>Commerce workspace</span>
+        </div>
+        <i data-lucide="chevrons-up-down"></i>
+      </div>
+
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="navigation">
+        <button class="nav-link active" data-view="overview">
+          <i data-lucide="layout-dashboard"></i><span>Overview</span>
+        </button>
+        <button class="nav-link" data-view="analytics">
+          <i data-lucide="chart-no-axes-combined"></i><span>Analytics</span>
+          <span class="nav-new">PRO</span>
+        </button>
+        <button class="nav-link" data-view="orders">
+          <i data-lucide="shopping-bag"></i><span>Orders</span>
+          <span class="nav-count" id="sidebarOrderCount">0</span>
+        </button>
+        <button class="nav-link" data-view="customers">
+          <i data-lucide="users"></i><span>Customers</span>
+        </button>
+        <button class="nav-link" data-view="products">
+          <i data-lucide="package"></i><span>Products</span>
+        </button>
+      </nav>
+
+      <div class="nav-label nav-label-spaced">MANAGEMENT</div>
+      <nav class="navigation">
+        <button class="nav-link" data-view="activity">
+          <i data-lucide="activity"></i><span>Activity log</span>
+        </button>
+        <button class="nav-link" data-view="settings">
+          <i data-lucide="settings-2"></i><span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="help-card">
+          <div class="help-icon"><i data-lucide="sparkles"></i></div>
+          <strong>Ready to grow?</strong>
+          <p>Keep an eye on your performance and make smarter decisions.</p>
+          <button data-view-link="analytics">Explore analytics <i data-lucide="arrow-up-right"></i></button>
+        </div>
+
+        <div class="sidebar-profile">
+          <div class="profile-avatar">JD</div>
+          <div class="profile-info">
+            <strong>Jordan Davis</strong>
+            <span>Store administrator</span>
+          </div>
+          <button class="profile-menu" id="profileButton" aria-label="Profile options">
+            <i data-lucide="ellipsis"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button mobile-menu" id="mobileMenu" aria-label="Open navigation">
+            <i data-lucide="menu"></i>
+          </button>
+
+          <div class="breadcrumb">
+            <span>Workspace</span>
+            <i data-lucide="chevron-right"></i>
+            <strong id="breadcrumbTitle">Overview</strong>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <label class="global-search">
+            <i data-lucide="search"></i>
+            <input type="search" id="globalSearch" placeholder="Search orders...">
+            <kbd>Ctrl K</kbd>
+          </label>
+
+          <button class="icon-button" id="themeToggle" aria-label="Switch theme">
+            <i data-lucide="moon"></i>
+          </button>
+
+          <button class="icon-button notification-button" id="notificationButton" aria-label="Notifications">
+            <i data-lucide="bell"></i>
+            <span class="notification-dot"></span>
+          </button>
+
+          <div class="top-profile">JD</div>
+        </div>
+      </header>
+
+      <div class="page-content">
+
+        <!-- =====================================
+             OVERVIEW
+        ====================================== -->
+        <section class="page-view active" id="view-overview">
+
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow"><span class="live-dot"></span> YOUR BUSINESS COMMAND CENTER</div>
+              <h1>Welcome back, Jordan <span>✦</span></h1>
+              <p>Here's what's happening with NOVA Store today.</p>
+            </div>
+
+            <div class="heading-actions">
+              <button class="button button-secondary" id="exportButton">
+                <i data-lucide="download"></i> Export data
+              </button>
+              <button class="button button-primary" id="quickAddOrder">
+                <i data-lucide="plus"></i> Create order
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI CARDS -->
+          <div class="metrics-grid">
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>Total revenue</span>
+                <span class="metric-icon purple"><i data-lucide="wallet"></i></span>
+              </div>
+              <div class="metric-value" id="revenueMetric">$0</div>
+              <div class="metric-footer">
+                <span class="metric-change positive"><i data-lucide="trending-up"></i> 12.8%</span>
+                <span>vs. previous period</span>
+              </div>
+              <div class="mini-visual purple-visual">▁ ▂ ▃ ▂ ▅ ▄ ▆ ▇</div>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>Total orders</span>
+                <span class="metric-icon blue"><i data-lucide="shopping-cart"></i></span>
+              </div>
+              <div class="metric-value" id="ordersMetric">0</div>
+              <div class="metric-footer">
+                <span class="metric-change positive"><i data-lucide="trending-up"></i> 8.2%</span>
+                <span>vs. previous period</span>
+              </div>
+              <div class="mini-visual blue-visual">▁ ▃ ▂ ▄ ▃ ▅ ▆ ▇</div>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>Customers</span>
+                <span class="metric-icon green"><i data-lucide="users"></i></span>
+              </div>
+              <div class="metric-value" id="customersMetric">0</div>
+              <div class="metric-footer">
+                <span class="metric-change positive"><i data-lucide="trending-up"></i> 6.4%</span>
+                <span>vs. previous period</span>
+              </div>
+              <div class="mini-visual green-visual">▁ ▂ ▄ ▃ ▄ ▅ ▆ ▇</div>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>Products in stock</span>
+                <span class="metric-icon orange"><i data-lucide="package-check"></i></span>
+              </div>
+              <div class="metric-value" id="stockMetric">0</div>
+              <div class="metric-footer">
+                <span class="metric-change warning"><i data-lucide="alert-circle"></i> <span id="lowStockMetric">0</span> low stock</span>
+                <span>inventory overview</span>
+              </div>
+              <div class="mini-visual orange-visual">▁ ▂ ▃ ▄ ▄ ▅ ▃ ▆</div>
+            </article>
+
+          </div>
+
+          <!-- REVENUE + TRAFFIC -->
+          <div class="dashboard-grid main-charts">
+
+            <article class="panel revenue-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Revenue performance</h2>
+                  <p>Track your store's financial performance.</p>
+                </div>
+                <select class="select-control" id="revenueRange" aria-label="Revenue period">
+                  <option value="7">Last 7 days</option>
+                  <option value="30">Last 30 days</option>
+                  <option value="90">Last 90 days</option>
+                  <option value="365" selected>Last 12 months</option>
+                </select>
+              </div>
+
+              <div class="revenue-summary">
+                <strong id="revenueChartTotal">$0</strong>
+                <span class="metric-change positive">+12.8%</span>
+                <small>compared with the previous period</small>
+              </div>
+
+              <div class="chart-container revenue-chart-container">
+                <canvas id="revenueChart"></canvas>
+              </div>
+            </article>
+
+            <article class="panel traffic-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Order status</h2>
+                  <p>Breakdown of your orders.</p>
+                </div>
+                <span class="panel-menu">···</span>
+              </div>
+
+              <div class="donut-container">
+                <canvas id="statusChart"></canvas>
+                <div class="donut-center">
+                  <strong id="donutTotal">0</strong>
+                  <span>Total orders</span>
+                </div>
+              </div>
+
+              <div class="chart-legend" id="statusLegend"></div>
+            </article>
+
+          </div>
+
+          <!-- SALES CHART + INVENTORY -->
+          <div class="dashboard-grid lower-charts">
+
+            <article class="panel category-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Product performance</h2>
+                  <p>Best-performing products in your catalogue.</p>
+                </div>
+                <span class="subtle-label">By units sold</span>
+              </div>
+              <div class="chart-container bar-chart-container">
+                <canvas id="productChart"></canvas>
+              </div>
+            </article>
+
+            <article class="panel inventory-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Inventory health</h2>
+                  <p>Keep your products available.</p>
+                </div>
+                <button class="text-button" data-view-link="products">Manage <i data-lucide="arrow-up-right"></i></button>
+              </div>
+
+              <div class="inventory-highlight">
+                <div class="inventory-number" id="inventoryCount">0</div>
+                <div>
+                  <strong>Products available</strong>
+                  <span>Across your catalogue</span>
+                </div>
+              </div>
+
+              <div class="stock-progress">
+                <div class="stock-progress-label"><span>Healthy stock</span><strong id="healthyStockPercent">0%</strong></div>
+                <div class="progress-track"><span id="healthyStockBar"></span></div>
+              </div>
+
+              <div class="stock-progress">
+                <div class="stock-progress-label"><span>Low stock</span><strong id="lowStockPercent">0%</strong></div>
+                <div class="progress-track warning-track"><span id="lowStockBar"></span></div>
+              </div>
+
+              <div class="stock-alert" id="stockAlert">
+                <i data-lucide="alert-triangle"></i>
+                <span>Inventory is looking good.</span>
+              </div>
+            </article>
+
+          </div>
+
+          <!-- RECENT ORDERS -->
+          <article class="panel table-panel">
+            <div class="panel-heading table-panel-heading">
+              <div>
+                <h2>Recent orders</h2>
+                <p>Keep track of your latest sales.</p>
+              </div>
+              <button class="text-button" data-view-link="orders">View all orders <i data-lucide="arrow-right"></i></button>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ORDER</th>
+                    <th>CUSTOMER</th>
+                    <th>DATE</th>
+                    <th>AMOUNT</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody id="recentOrdersBody"></tbody>
+              </table>
+            </div>
+          </article>
+
+        </section>
+
+        <!-- =====================================
+             ANALYTICS
+        ====================================== -->
+        <section class="page-view" id="view-analytics">
+
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">BUSINESS INTELLIGENCE</div>
+              <h1>Analytics <span>✦</span></h1>
+              <p>Understand trends, measure growth and find opportunities.</p>
+            </div>
+            <button class="button button-secondary" id="analyticsExport">
+              <i data-lucide="download"></i> Export report
+            </button>
+          </div>
+
+          <div class="metrics-grid analytics-metrics">
+            <article class="metric-card">
+              <div class="metric-top"><span>Average order value</span><span class="metric-icon purple"><i data-lucide="receipt"></i></span></div>
+              <div class="metric-value" id="averageOrderMetric">$0</div>
+              <div class="metric-footer"><span class="metric-change positive">+5.8%</span><span>average transaction</span></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top"><span>Completed orders</span><span class="metric-icon green"><i data-lucide="check-circle"></i></span></div>
+              <div class="metric-value" id="completedMetric">0</div>
+              <div class="metric-footer"><span>Successfully completed</span></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top"><span>Pending orders</span><span class="metric-icon orange"><i data-lucide="clock"></i></span></div>
+              <div class="metric-value" id="pendingMetric">0</div>
+              <div class="metric-footer"><span>Awaiting processing</span></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top"><span>Cancelled orders</span><span class="metric-icon blue"><i data-lucide="ban"></i></span></div>
+              <div class="metric-value" id="cancelledMetric">0</div>
+              <div class="metric-footer"><span>Cancelled transactions</span></div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid analytics-grid">
+            <article class="panel panel-padding">
+              <div class="panel-heading">
+                <div><h2>Revenue analysis</h2><p>Explore your revenue by period.</p></div>
+                <select class="select-control" id="analyticsRange">
+                  <option value="7">7 days</option>
+                  <option value="30">30 days</option>
+                  <option value="90">90 days</option>
+                  <option value="365" selected>12 months</option>
+                </select>
+              </div>
+              <div class="chart-container large-chart"><canvas id="analyticsRevenueChart"></canvas></div>
+            </article>
+
+            <article class="panel panel-padding">
+              <div class="panel-heading"><div><h2>Order volume</h2><p>Transactions over time.</p></div></div>
+              <div class="chart-container large-chart"><canvas id="orderVolumeChart"></canvas></div>
+            </article>
+          </div>
+
+          <article class="panel table-panel">
+            <div class="panel-heading table-panel-heading">
+              <div><h2>Business insights</h2><p>Highlights based on the current store data.</p></div>
+            </div>
+            <div class="insights-grid">
+              <div class="insight-card">
+                <div class="insight-icon purple"><i data-lucide="trophy"></i></div>
+                <span>Top product</span>
+                <strong id="topProductInsight">—</strong>
+                <small>Highest units sold</small>
+              </div>
+              <div class="insight-card">
+                <div class="insight-icon green"><i data-lucide="calendar-check"></i></div>
+                <span>Best order status</span>
+                <strong id="topStatusInsight">—</strong>
+                <small>Most frequent status</small>
+              </div>
+              <div class="insight-card">
+                <div class="insight-icon orange"><i data-lucide="package-search"></i></div>
+                <span>Inventory alert</span>
+                <strong id="inventoryInsight">—</strong>
+                <small>Products needing attention</small>
+              </div>
+            </div>
+          </article>
+
+        </section>
+
+        <!-- =====================================
+             ORDERS
+        ====================================== -->
+        <section class="page-view" id="view-orders">
+
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">SALES MANAGEMENT</div>
+              <h1>Orders</h1>
+              <p>Manage transactions and track every customer purchase.</p>
+            </div>
+            <div class="heading-actions">
+              <button class="button button-secondary" id="ordersExport">
+                <i data-lucide="download"></i> Export CSV
+              </button>
+              <button class="button button-primary" id="addOrder">
+                <i data-lucide="plus"></i> Add order
+              </button>
+            </div>
+          </div>
+
+          <div class="metrics-grid compact-metrics">
+            <article class="metric-card mini-metric"><span>Total orders</span><strong id="allOrdersMetric">0</strong></article>
+            <article class="metric-card mini-metric"><span>Completed</span><strong id="ordersCompletedMetric">0</strong></article>
+            <article class="metric-card mini-metric"><span>Pending</span><strong id="ordersPendingMetric">0</strong></article>
+            <article class="metric-card mini-metric"><span>Total order value</span><strong id="ordersValueMetric">$0</strong></article>
+          </div>
+
+          <article class="panel table-panel">
+            <div class="table-panel-heading table-heading-spaced">
+              <div><h2>All orders</h2><p>Search, sort, update and manage orders.</p></div>
+            </div>
+
+            <div class="table-toolbar">
+              <label class="table-search">
+                <i data-lucide="search"></i>
+                <input type="search" id="orderSearch" placeholder="Search by order ID or customer...">
+              </label>
+
+              <div class="table-filter-group">
+                <select id="orderStatusFilter" class="select-control">
+                  <option value="all">All statuses</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+                <select id="orderSort" class="select-control">
+                  <option value="newest">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                  <option value="high">Highest amount</option>
+                  <option value="low">Lowest amount</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="bulk-toolbar" id="bulkToolbar">
+              <span id="selectedCount">0 selected</span>
+              <button class="danger-button" id="deleteSelected">Delete selected</button>
+            </div>
+
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" id="selectAllOrders" aria-label="Select all orders"></th>
+                    <th>ORDER ID</th>
+                    <th>CUSTOMER</th>
+                    <th>DATE</th>
+                    <th>AMOUNT</th>
+                    <th>STATUS</th>
+                    <th>ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="ordersEmpty" hidden>
+                <i data-lucide="search-x"></i>
+                <strong>No orders found</strong>
+                <span>Try changing your search or filters.</span>
+              </div>
+            </div>
+
+            <div class="table-pagination">
+              <span id="ordersTableInfo">Showing 0 orders</span>
+              <div>
+                <button id="ordersPrev" aria-label="Previous page"><i data-lucide="chevron-left"></i></button>
+                <span id="ordersPage">1 / 1</span>
+                <button id="ordersNext" aria-label="Next page"><i data-lucide="chevron-right"></i></button>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <!-- =====================================
+             CUSTOMERS
+        ====================================== -->
+        <section class="page-view" id="view-customers">
+
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">CUSTOMER RELATIONSHIPS</div>
+              <h1>Customers</h1>
+              <p>Understand the people behind your sales.</p>
+            </div>
+            <button class="button button-secondary" id="customerExport">
+              <i data-lucide="download"></i> Export customers
+            </button>
+          </div>
+
+          <div class="metrics-grid compact-metrics">
+            <article class="metric-card mini-metric"><span>Total customers</span><strong id="customerTotal">0</strong></article>
+            <article class="metric-card mini-metric"><span>Returning customers</span><strong id="returningTotal">0</strong></article>
+            <article class="metric-card mini-metric"><span>Average spend</span><strong id="customerAverage">$0</strong></article>
+            <article class="metric-card mini-metric"><span>VIP customers</span><strong id="vipTotal">0</strong></article>
+          </div>
+
+          <article class="panel table-panel">
+            <div class="table-heading-spaced">
+              <div><h2>Customer directory</h2><p>Search your customer base and review purchasing patterns.</p></div>
+            </div>
+            <div class="table-toolbar">
+              <label class="table-search">
+                <i data-lucide="search"></i>
+                <input type="search" id="customerSearch" placeholder="Search customers...">
+              </label>
+              <select class="select-control" id="customerFilter">
+                <option value="all">All customers</option>
+                <option value="New">New</option>
+                <option value="Returning">Returning</option>
+                <option value="VIP">VIP</option>
+              </select>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead><tr>
+                  <th>CUSTOMER</th><th>EMAIL</th><th>ORDERS</th><th>TOTAL SPENT</th><th>LAST ORDER</th><th>SEGMENT</th>
+                </tr></thead>
+                <tbody id="customersTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="customersEmpty" hidden>No customers found.</div>
+            </div>
+          </article>
+        </section>
+
+        <!-- =====================================
+             PRODUCTS
+        ====================================== -->
+        <section class="page-view" id="view-products">
+
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">CATALOGUE & INVENTORY</div>
+              <h1>Products</h1>
+              <p>Manage your product catalogue, pricing and stock.</p>
+            </div>
+            <button class="button button-primary" id="addProduct">
+              <i data-lucide="plus"></i> Add product
+            </button>
+          </div>
+
+          <div class="metrics-grid compact-metrics">
+            <article class="metric-card mini-metric"><span>Total products</span><strong id="productTotal">0</strong></article>
+            <article class="metric-card mini-metric"><span>In stock</span><strong id="productHealthy">0</strong></article>
+            <article class="metric-card mini-metric"><span>Low stock</span><strong id="productLow">0</strong></article>
+            <article class="metric-card mini-metric"><span>Out of stock</span><strong id="productOut">0</strong></article>
+          </div>
+
+          <article class="panel table-panel">
+            <div class="table-heading-spaced">
+              <div><h2>Product inventory</h2><p>Update products and keep inventory under control.</p></div>
+            </div>
+
+            <div class="table-toolbar">
+              <label class="table-search">
+                <i data-lucide="search"></i>
+                <input type="search" id="productSearch" placeholder="Search product or SKU...">
+              </label>
+              <div class="table-filter-group">
+                <select class="select-control" id="categoryFilter">
+                  <option value="all">All categories</option>
+                </select>
+                <select class="select-control" id="stockFilter">
+                  <option value="all">All stock levels</option>
+                  <option value="In stock">In stock</option>
+                  <option value="Low stock">Low stock</option>
+                  <option value="Out of stock">Out of stock</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-scroll">
+              <table>
+                <thead><tr>
+                  <th>PRODUCT</th><th>SKU</th><th>CATEGORY</th><th>PRICE</th><th>STOCK</th><th>STATUS</th><th>ACTIONS</th>
+                </tr></thead>
+                <tbody id="productsTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="productsEmpty" hidden>No matching products.</div>
+            </div>
+          </article>
+        </section>
+
+        <!-- =====================================
+             ACTIVITY
+        ====================================== -->
+        <section class="page-view" id="view-activity">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">WORKSPACE MONITORING</div>
+              <h1>Activity log</h1>
+              <p>A record of important actions in your store.</p>
+            </div>
+            <button class="button button-secondary" id="clearActivity">
+              <i data-lucide="trash-2"></i> Clear activity
+            </button>
+          </div>
+
+          <article class="panel activity-panel">
+            <div class="panel-heading">
+              <div><h2>Recent events</h2><p>Actions recorded during this browser session and saved history.</p></div>
+              <span class="live-indicator"></span>
+            </div>
+            <div id="activityList" class="activity-list"></div>
+            <div class="empty-state" id="activityEmpty" hidden>No activity has been recorded yet.</div>
+          </article>
+        </section>
+
+        <!-- =====================================
+             SETTINGS
+        ====================================== -->
+        <section class="page-view" id="view-settings">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">PERSONALIZE YOUR WORKSPACE</div>
+              <h1>Settings</h1>
+              <p>Manage your dashboard experience and preferences.</p>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <article class="panel panel-padding">
+              <div class="panel-heading">
+                <div><h2>Appearance</h2><p>Customize the way NOVA looks.</p></div>
+                <i data-lucide="palette"></i>
+              </div>
+              <div class="setting-row">
+                <div><strong>Dark mode</strong><span>Use the dark colour scheme.</span></div>
+                <button class="switch" id="settingsTheme" aria-label="Toggle dark mode"></button>
+              </div>
+              <div class="setting-row">
+                <div><strong>Compact tables</strong><span>Reduce the spacing in data tables.</span></div>
+                <button class="switch" id="compactTables" aria-label="Toggle compact tables"></button>
+              </div>
+            </article>
+
+            <article class="panel panel-padding">
+              <div class="panel-heading">
+                <div><h2>Store information</h2><p>Example workspace information.</p></div>
+                <i data-lucide="store"></i>
+              </div>
+              <div class="setting-information"><span>Store name</span><strong>NOVA Store</strong></div>
+              <div class="setting-information"><span>Account role</span><strong>Administrator</strong></div>
+              <div class="setting-information"><span>Dashboard version</span><strong>1.0.0</strong></div>
+              <div class="setting-information"><span>Data storage</span><strong>Browser local storage</strong></div>
+            </article>
+
+            <article class="panel panel-padding">
+              <div class="panel-heading">
+                <div><h2>Data management</h2><p>Export a backup or restore the original sample data.</p></div>
+                <i data-lucide="database"></i>
+              </div>
+              <button class="button button-secondary full-button" id="backupButton"><i data-lucide="download"></i> Download data backup</button>
+              <button class="button button-danger full-button" id="resetButton"><i data-lucide="refresh-ccw"></i> Reset demonstration data</button>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <span>© <span id="currentYear"></span> NOVA Commerce. Built for better decisions.</span>
+          <span>Commerce intelligence <b>✦</b></span>
+        </footer>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ORDER MODAL -->
+  <div class="modal-backdrop" id="orderModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="orderModalHeading">
+      <button class="modal-close" data-close-modal="orderModal" aria-label="Close">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="modal-symbol"><i data-lucide="shopping-bag"></i></div>
+      <h2 id="orderModalHeading">Create order</h2>
+      <p>Enter the customer and transaction information.</p>
+
+      <form id="orderForm">
+        <input type="hidden" name="id">
+        <div class="form-field">
+          <label for="orderCustomer">Customer name</label>
+          <input id="orderCustomer" name="customer" maxlength="70" required placeholder="e.g. Taylor Morgan">
+        </div>
+        <div class="form-field">
+          <label for="orderEmail">Customer email</label>
+          <input id="orderEmail" name="email" type="email" required placeholder="customer@example.com">
+        </div>
+        <div class="form-two-column">
+          <div class="form-field">
+            <label for="orderAmount">Amount</label>
+            <input id="orderAmount" name="amount" type="number" min="0.01" step="0.01" required placeholder="120.00">
+          </div>
+          <div class="form-field">
+            <label for="orderDate">Order date</label>
+            <input id="orderDate" name="date" type="date" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="orderStatus">Order status</label>
+          <select id="orderStatus" name="status">
+            <option>Pending</option>
+            <option>Completed</option>
+            <option>Cancelled</option>
+          </select>
+        </div>
+        <button class="button button-primary submit-button" type="submit">Save order</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- PRODUCT MODAL -->
+  <div class="modal-backdrop" id="productModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="productModalHeading">
+      <button class="modal-close" data-close-modal="productModal" aria-label="Close">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="modal-symbol"><i data-lucide="package"></i></div>
+      <h2 id="productModalHeading">Add product</h2>
+      <p>Add an item to the store catalogue.</p>
+
+      <form id="productForm">
+        <input type="hidden" name="id">
+        <div class="form-field">
+          <label for="productName">Product name</label>
+          <input id="productName" name="name" maxlength="70" required placeholder="Product name">
+        </div>
+        <div class="form-two-column">
+          <div class="form-field">
+            <label for="productCategory">Category</label>
+            <input id="productCategory" name="category" maxlength="40" required placeholder="Accessories">
+          </div>
+          <div class="form-field">
+            <label for="productSKU">SKU</label>
+            <input id="productSKU" name="sku" maxlength="24" required placeholder="PR-1008">
+          </div>
+        </div>
+        <div class="form-two-column">
+          <div class="form-field">
+            <label for="productPrice">Price</label>
+            <input id="productPrice" name="price" type="number" min="0.01" step="0.01" required placeholder="49.99">
+          </div>
+          <div class="form-field">
+            <label for="productStock">Stock quantity</label>
+            <input id="productStock" name="stock" type="number" min="0" step="1" required placeholder="25">
+          </div>
+        </div>
+        <button class="button button-primary submit-button" type="submit">Save product</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <i data-lucide="check-circle"></i>
+    <span id="toastMessage">Success</span>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
